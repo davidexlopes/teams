@@ -1,0 +1,146 @@
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Scanner;
+import java.util.stream.Collectors;
+
+public class FootballMatchResults {
+    public static void main(String[] args) {
+        // Create a HashMap to store the match results
+        Map<String, Team> matchResults = new HashMap<>();
+
+        // Create a Random object to generate random goals
+        Random random = new Random();
+
+        // Create a list of football teams
+        List<Team> teams = new ArrayList<>();
+        teams.add(new Team("Team A"));
+        teams.add(new Team("Team B"));
+        teams.add(new Team("Team C"));
+        teams.add(new Team("Team D"));
+        teams.add(new Team("Team E"));
+        teams.add(new Team("Team F"));
+
+        // Generate random matches and goals for each match
+        for (int i = 0; i < teams.size(); i++) {
+            for (int j = i + 1; j < teams.size(); j++) {
+                Team team1 = teams.get(i);
+                Team team2 = teams.get(j);
+                int team1Goals = random.nextInt(6);
+                int team2Goals = random.nextInt(6);
+                if (team1Goals > team2Goals) {
+                    team1.addPoints(3); // Victory
+                } else if (team1Goals < team2Goals) {
+                    team2.addPoints(3); // Victory
+                } else {
+                    team1.addPoints(1); // Draw
+                    team2.addPoints(1); // Draw
+                }
+                team1.addGoalsScored(team1Goals);
+                team1.addGoalsConceded(team2Goals);
+                team2.addGoalsScored(team2Goals);
+                team2.addGoalsConceded(team1Goals);
+                team1.incrementMatchesPlayed();
+                team2.incrementMatchesPlayed();
+            }
+        }
+
+        // Sort the teams by points and, in case of a tie, by goals scored
+        List<Team> sortedTeams = teams.stream()
+                .sorted(Comparator.comparing(Team::getPoints)
+                        .thenComparing(Team::getGoalsScored)
+                        .reversed())
+                .collect(Collectors.toList());
+
+        // Print the ordered teams
+        System.out.println("Team\t\tPoints\tMatches Played\tGoals Scored\tGoals Conceded");
+        for (Team team : sortedTeams) {
+            System.out.printf("%-10s\t%d\t%d\t\t%d\t\t%d%n", team.getName(), team.getPoints(),
+                    team.getMatchesPlayed(), team.getGoalsScored(), team.getGoalsConceded());
+        }
+
+        // Create a Scanner object to read user input
+        Scanner scanner = new Scanner(System.in);
+
+        // Prompt the user to enter a team name
+        System.out.print("Enter a team name: ");
+        String teamName = scanner.nextLine();
+
+        // Check if the entered team name exists in the match results
+        boolean teamExists = matchResults.containsKey(teamName);
+
+        if (teamExists) {
+            // Retrieve the team's statistics
+            Team team = matchResults.get(teamName);
+
+            // Display the team's statistics to the user
+            System.out.println("Team: " + team.getName());
+            System.out.println("Points: " + team.getPoints());
+            System.out.println("Matches Played: " + team.getMatchesPlayed());
+            System.out.println("Goals Scored: " + team.getGoalsScored());
+            System.out.println("Goals Conceded: " + team.getGoalsConceded());
+        } else {
+            // If the entered team name does not exist in the match results
+            System.out.println("No match result found for " + teamName);
+        }
+
+        // Close the Scanner
+        scanner.close();
+    }
+
+    // Helper class to represent a team
+    private static class Team {
+        private final String name;
+        private int points;
+        private int goalsScored;
+        private int goalsConceded;
+        private int matchesPlayed;
+
+        public Team(String name) {
+            this.name = name;
+            this.points = 0;
+            this.goalsScored = 0;
+            this.goalsConceded = 0;
+            this.matchesPlayed = 0;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public int getPoints() {
+            return points;
+        }
+
+        public void addPoints(int points) {
+            this.points += points;
+        }
+
+        public int getGoalsScored() {
+            return goalsScored;
+        }
+
+        public void addGoalsScored(int goalsScored) {
+            this.goalsScored += goalsScored;
+        }
+
+        public int getGoalsConceded() {
+            return goalsConceded;
+        }
+
+        public void addGoalsConceded(int goalsConceded) {
+            this.goalsConceded += goalsConceded;
+        }
+
+        public int getMatchesPlayed() {
+            return matchesPlayed;
+        }
+
+        public void incrementMatchesPlayed() {
+            this.matchesPlayed++;
+        }
+    }
+}
